@@ -203,7 +203,7 @@ public class GameHandler{
         Iterator<Unit> unitIterator = Dead_Deck.iterator();
         while(unitIterator.hasNext()){
             Unit nextUnit = unitIterator.next();
-            if(nextUnit.getEffect("Dead") == 1){
+            if(nextUnit.getEffect("Dead") == 5){
                 System.out.println(nextUnit.getName() + " cannot be revived anymore.");
                 Point location = new Point(nextUnit.getX(), nextUnit.getY());
                 playfield.remove(location);
@@ -216,12 +216,14 @@ public class GameHandler{
         Scanner stream = new Scanner(System.in);
         System.out.println("Your turn!\nSyntax: -attack x y; -move x y; -skip; -retreat; -help");
         String input = "";
+        ArrayList<Unit> revived = new ArrayList<>();
         for (Unit u: Player_Deck){
             System.out.println("Now in control of: " + u.getName());
             int actions = 2;
             int threat = 0;
             int opDamage = 0;
             while (actions > 0){
+                Unit addable = null;
                 drawDeadUnits();
                 assignThreatenedStatus();
                 if (threat == 1 && u.getEffect("Threatened") == 0){
@@ -278,11 +280,14 @@ public class GameHandler{
                         continue;
                     }
                     int indexOfInjured = findUnitByCoordinates(Dead_Deck, injured);
-                    Player_Deck.add(Dead_Deck.get(indexOfInjured));
-                    Dead_Deck.remove(indexOfInjured);
+                    //Player_Deck.add(Dead_Deck.get(indexOfInjured));
                     playfield.remove(injured);
-                    playfield.put(injured, Player_Deck.get(Player_Deck.size()-1).getSymbol());
-                    Player_Deck.get(Player_Deck.size()-1).setHealth(10);
+                    addable = Dead_Deck.get(indexOfInjured);
+                    Dead_Deck.remove(indexOfInjured);
+                    playfield.put(injured, addable.getSymbol());
+                    addable.setHealth(10);
+                    revived.add(addable);
+                    //Player_Deck.get(Player_Deck.size()-1).setHealth(10);
                     System.out.println(u.getName() + " says: " + "Heroes never die!");
                     System.out.println(this);
                     if (endCondition()){
@@ -398,6 +403,7 @@ public class GameHandler{
                 }
             }
         }
+        Player_Deck.addAll(revived);
     }
 
     public void invaderTurn(){

@@ -5,7 +5,7 @@ public class Infantry extends Unit{
         modifyCoordinates(x,y);
         name = "Infantry type ";
         if(type == 1){
-            stats = new int[]{50, 100, 100, 8, 3, 10};
+            stats = new int[]{50, 100, 100, 8, 10, 10};
             name = name + "Swordman";
             symbol = 'ĩ';
             alt_symbol = 'Ĩ';
