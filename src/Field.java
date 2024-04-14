@@ -72,9 +72,25 @@ public class Field{
         }
         addObstacles();
     }
-    Field(int _width, int _height){
-        width = _width;
-        height = _height;
+    private void fillFieldLoaded(MapData loadedMap){
+        for (int i = 0; i < height; i++){
+            for(int j = 0; j < width; j++){
+                field[i][j] = loadedMap.mapLayout[i][j];
+            }
+        }
+    }
+    Field(MapData loadedMap){
+        this.width = loadedMap.width;
+        this.height = loadedMap.height;
+        field = new char[height][width];
+        field_printable = new char[height][width];
+        fillFieldLoaded(loadedMap);
+        copyField();
+
+    }
+    Field(int width, int height){
+        this.width = width;
+        this.height = height;
         field = new char[height][width];
         field_printable = new char[height][width];
         fillField();
