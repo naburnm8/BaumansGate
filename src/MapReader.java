@@ -20,7 +20,7 @@ public class MapReader {
         }
         return converted;
     }
-    MapData read() throws IOException, IncorrectFileStructure {
+    MapData read() throws IOException, IncorrectFileStructure, IllegalTileSymbol {
         FileReader fr = new FileReader(path);
         Scanner stream = new Scanner(fr);
         if (!stream.hasNextInt()){
