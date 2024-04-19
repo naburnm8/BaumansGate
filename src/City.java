@@ -105,20 +105,14 @@ public class City {
         addableResearchedUnits = new ArrayList<>();
         return out;
     }
+    public ArrayList<Unit> getResearchedUnitsSafe(){
+        return addableResearchedUnits;
+    }
     public void getResources(int gold){
         resources[0] = resources[0] + gold*getBuildingByName("Market");
         resources[1] = resources[1] + gold*getBuildingByName("Market");
         //System.out.println(gold*buildings[getBuildingByName("Market")]+ " " + gold + " " + buildings[getBuildingByName("Market")]);
     }
-    /*
-    public void configureTavern(){
-        if (buildings[BuildingNameToIndex("Tavern")] == 0){
-            return;
-        }
-        for (int i = 0; i < buildings[BuildingNameToIndex("Tavern")]; i++){
-            System.out.println("Which stat do you want to enhance? [");
-        }
-    }
-    */
+
 
 }

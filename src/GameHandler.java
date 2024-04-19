@@ -290,8 +290,26 @@ public class GameHandler{
                     continue;
                 }
                 if(input.equals("-addResearched")){
+                    ArrayList<Unit> toAdd = city.getResearchedUnitsSafe();
+                    boolean skipped = false;
+                    for (Unit unit: toAdd){
+                        Scanner stream3 = new Scanner(System.in);
+                        System.out.println("Enter coordinates for unit " + unit.getName() + ": \nSyntax: x,y");
+                        String scanned = stream3.nextLine();
+                        String[] split = scanned.split(",");
+                        int x = Integer.parseInt(split[0]);
+                        int y = Integer.parseInt(split[1]);
+                        if (playfield.isOccupied(new Point(x,y))){
+                            System.out.println("Spot is occupied!");
+                            skipped = true;
+                            break;
+                        }
+                        unit.modifyCoordinates(x,y);
+                    }
+                    if (skipped){
+                        continue;
+                    }
                     revived.addAll(city.getResearchedUnits());
-                    System.out.println("Researched units will be added by your next turn!");
                     continue;
                 }
                 if(input.equals("-build")){
