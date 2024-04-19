@@ -47,6 +47,8 @@ public class BaumansGate {
                 System.out.println("Class not found exception!");
                 System.exit(-112);
             }
+            outputStream.close();
+            objectInputStream.close();
         }
         System.out.println("Would you like to load a map? [path/n]");
         String path = stream1.next();
