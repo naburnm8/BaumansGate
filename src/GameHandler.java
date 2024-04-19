@@ -1,12 +1,19 @@
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.*;
 
 public class GameHandler{
     private ArrayList<Unit> Player_Deck;
     private ArrayList<Unit> Invader_Deck;
     private ArrayList<Unit> Dead_Deck;
+    private String playerName;
     private Shop shop;
+    private int account;
     private Field playfield;
     private char[] gnd_symbols;
+    private City city;
     final private double[][] fines = {{1,1.5,2,1.2},{1,1.8,2.2,1},{1,2.2,1.2,1.5}};
     private int gndSymbolToIndex(char symbol){
         for (int i = 0; i < gnd_symbols.length; i++){
@@ -45,13 +52,19 @@ public class GameHandler{
             playfield.put(a, symbol);
         }
     }
-    GameHandler(boolean streamlined, int _width, int _height){
+    GameHandler(boolean streamlined, int _width, int _height, String playerName){
+        this(streamlined, _width, _height, null, null,playerName);
+    }
+    GameHandler(boolean streamlined, int _width, int _height, SaveGame loaded, MapData map, String playerName){
         Dead_Deck = new ArrayList<>();
+        this.playerName = playerName;
         gnd_symbols = Field.gnd_symbols;
         Player_Deck = new ArrayList<>();
         Invader_Deck = new ArrayList<>();
-        shop = new Shop(70);
+        account = 70;
+        shop = new Shop(account);
         Player_Deck = shop.commenceShopping(streamlined);
+        account = shop.getAccount();
         Invader_Deck = shop.invaderShopping(streamlined);
         if (streamlined){
             playfield = new Field(10,10);
@@ -64,6 +77,15 @@ public class GameHandler{
             System.exit(-113);
         }
         putCharacters();
+        city = new City(20,20);
+        if (loaded == null){
+            return;
+        }
+        city = new City(loaded.resources()[0], loaded.resources()[1], loaded.buildings(), loaded.researchedUnits());
+        if (map == null){
+            return;
+        }
+        playfield = new Field(map);
     }
     @Override
     public String toString() {
@@ -211,10 +233,17 @@ public class GameHandler{
             }
         }
     }
-    public void playerTurn(){
+    private void assignCityEffects(){
+        for(Unit u: Player_Deck){
+            for(int i = 0; i < city.modStats.length; i++){
+                u.modifyStatByName(city.modStats[i], u.getBaseStatByName(city.modStats[i]) + city.getBuildingByName(city.names[i]));
+            }
+        }
+    }
+    public void playerTurn() throws IOException {
         bleedOut();
         Scanner stream = new Scanner(System.in);
-        System.out.println("Your turn!\nSyntax: -attack x y; -move x y; -skip; -retreat; -help");
+        System.out.println("Your turn!\nSyntax: -attack x y; -move x y; -skip; -retreat; -help; -build; -addResearched; -getResources");
         String input = "";
         ArrayList<Unit> revived = new ArrayList<>();
         for (Unit u: Player_Deck){
@@ -224,6 +253,7 @@ public class GameHandler{
             int opDamage = 0;
             while (actions > 0){
                 Unit addable = null;
+                assignCityEffects();
                 drawDeadUnits();
                 assignThreatenedStatus();
                 if (threat == 1 && u.getEffect("Threatened") == 0){
@@ -236,12 +266,60 @@ public class GameHandler{
                         Player_Deck.remove(index);
                     }
                     else{
-                        System.out.println(u.getName() + " gets " + opDamage + "damage by an opportunity attack!");
+                        System.out.println(u.getName() + " gets " + opDamage + " damage by an opportunity attack!");
                     }
                 }
                 opDamage = u.getEffect("OpportunityDamage");
                 threat = u.getEffect("Threatened");
                 input = stream.nextLine();
+                if(input.equals("-getResources")){
+                    if(city.getBuildingByName("Market") == 0){
+                        System.out.println("No market built!");
+                        continue;
+                    }
+                    System.out.println("Account: " + account + "\n" + "How much gold would you like to spend? ");
+                    Scanner stream2 = new Scanner(System.in);
+                    int spent = stream2.nextInt();
+                    if(account - spent < 0){
+                        System.out.println("Not enough gold!");
+                        continue;
+                    }
+                    account = account - spent;
+                    city.getResources(spent);
+                    System.out.println("Resources acquired!");
+                    continue;
+                }
+                if(input.equals("-addResearched")){
+                    revived.addAll(city.getResearchedUnits());
+                    System.out.println("Researched units will be added by your next turn!");
+                    continue;
+                }
+                if(input.equals("-build")){
+                    while(true){
+                        System.out.println(city);
+                        System.out.println(city.toStringShop());
+                        System.out.println("Syntax: -new BuildingName; -research; -quit");
+                        Scanner stream1 = new Scanner(System.in);
+                        String scanned = stream1.nextLine();
+                        String[] split = scanned.split(" ");
+                        if (scanned.equals("-quit")){
+                            break;
+                        }
+                        if (scanned.equals("-research")){
+                            if(!city.researchUnit()){
+                                System.out.println("No research for you!");
+                                continue;
+                            }
+                        }
+                        if (split[0].equals("-new")){
+                            if(!city.BuildBuilding(split[1])){
+                                System.out.println("No building was built");
+                                continue;
+                            }
+                        }
+                    }
+                    continue;
+                }
                 if (input.equals("-skip")){
                     actions = actions - 1;
                     System.out.println(this);
@@ -345,6 +423,8 @@ public class GameHandler{
                             Invader_Deck.remove(indexOfDefender);
                             actions = actions - 1;
                             System.out.println(this);
+                            System.out.println("Resources acquired: 5 wood, 5 rock");
+                            city.addResources(5,5);
                             if (endCondition()){
                                 System.exit(0);
                             }
@@ -444,13 +524,23 @@ public class GameHandler{
         drawDeadUnits();
         System.out.println(log);
     }
-    public boolean endCondition(){
+    private void save() throws IOException {
+        FileOutputStream outputStream = new FileOutputStream(playerName + ".sav");
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
+        objectOutputStream.writeObject(city.export());
+        objectOutputStream.close();
+        outputStream.close();
+    }
+    public boolean endCondition() throws IOException {
         if (Player_Deck.isEmpty()){
             System.out.println("Invader wins!");
+            save();
             return true;
         }
         if (Invader_Deck.isEmpty()){
             System.out.println("Player wins!");
+            city.addResources(20,20);
+            save();
             return true;
         }
         return false;

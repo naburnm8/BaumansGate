@@ -6,6 +6,7 @@ public class Mounted extends Unit{
         name = "Mounted type ";
         if(type == 1){
             stats = new int[]{30, 5, 1, 3, 6, 20};
+            stats_noCHNG = new int[]{30, 5, 1, 3, 6, 20};
             name = name + "Knight";
             symbol = 'ŕ';
             alt_symbol = 'Ŕ';
@@ -13,6 +14,7 @@ public class Mounted extends Unit{
         }
         else if (type == 2) {
             stats = new int[]{50,2,1,7,5,23};
+            stats_noCHNG = new int[]{50,2,1,7,5,23};
             name = name + "Armoured";
             symbol = 'ŗ';
             alt_symbol = 'Ŗ';
@@ -20,6 +22,7 @@ public class Mounted extends Unit{
         }
         else if (type == 3) {
             stats = new int[]{25,3,3,2,5,25};
+            stats_noCHNG = new int[]{25,3,3,2,5,25};
             name = name + "Archer";
             symbol = 'ř';
             alt_symbol = 'Ř';
@@ -27,6 +30,7 @@ public class Mounted extends Unit{
         }
         else {
             stats = new int[]{30, 5, 1, 3, 6, 20};
+            stats_noCHNG = new int[]{30, 5, 1, 3, 6, 20};
             name = name + "Knight";
             symbol = 'ŕ';
             alt_symbol = 'Ŕ';

@@ -20,6 +20,9 @@ public class Shop{
         account = _account;
         initialiseCatalogue();
     }
+    public int getAccount(){
+        return account;
+    }
     private void printCatalogue(){
         for(int i = 0; i < Catalogue.size(); i++){
             System.out.println((i+1) + ".");

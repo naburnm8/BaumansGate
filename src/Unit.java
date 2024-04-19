@@ -1,9 +1,14 @@
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.HashMap;
 
-public abstract class Unit {
+public abstract class Unit implements Serializable{
+    @Serial
+    private static final long serialVersionUID = 1489;
     protected int[] stats = new int[6];
+    protected int[] stats_noCHNG = new int[6];
     protected int curr_health;
-    final protected String[] stat_names = {"Health","Attack","Range","Defence","Movement","Cost"};
+    final public String[] stat_names = {"Health","Attack","Range","Defence","Movement","Cost"};
     protected int[] coordinates = new int[2];
     protected String name;
     protected char symbol;
@@ -18,6 +23,13 @@ public abstract class Unit {
             }
         }
         return -1;
+    }
+    public int getBaseStatByName(String stat){
+        int stat_index = StatNameToIndex(stat);
+        if (stat_index == -1){
+            return -1;
+        }
+        return stats_noCHNG[stat_index];
     }
     public int getEffect(String key){
         if (effects.get(key) == null){
@@ -37,6 +49,16 @@ public abstract class Unit {
             return -1;
         }
         return stats[stat_index];
+    }
+    public void modifyStatByName(String stat, int value){
+        int stat_index = StatNameToIndex(stat);
+        if (stat_index == -1){
+            return;
+        }
+        stats[stat_index] = value;
+    }
+    public void replaceStats(int[] stats){
+        this.stats = stats;
     }
     public int getCurrentHealth(){
         return curr_health;

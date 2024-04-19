@@ -1,8 +1,9 @@
+import java.io.*;
 import java.util.Scanner;
 class NotEnoughFieldSpace extends Exception{}
 
 public class BaumansGate {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         System.out.println("Welcome to Bauman's Gate!");
         System.out.println("Current gamemode: " + args[0]);
         int width = 0;
@@ -30,7 +31,40 @@ public class BaumansGate {
             System.out.println("Unknown gamemode. Program halted");
             System.exit(-1);
         }
-        GameHandler instance1 = new GameHandler(streamlined,width,height);
+        System.out.println("Enter your nickname: ");
+        Scanner stream1 = new Scanner(System.in);
+        String playerName = stream1.next();
+        File f = new File(playerName + ".sav");
+        SaveGame saveGame = null;
+        GameHandler instance1 = null;
+        MapData loaded = null;
+        if(f.exists() && !f.isDirectory()){
+            FileInputStream outputStream = new FileInputStream(playerName + ".sav");
+            ObjectInputStream objectInputStream = new ObjectInputStream(outputStream);
+            try{
+            saveGame = (SaveGame) objectInputStream.readObject();}
+            catch (ClassNotFoundException e){
+                System.out.println("Class not found exception!");
+                System.exit(-112);
+            }
+        }
+        System.out.println("Would you like to load a map? [path/n]");
+        String path = stream1.next();
+        if (!path.equals("n")){
+            MapReader reader = new MapReader(path);
+            try{
+                loaded = reader.read();
+            } catch (IncorrectFileStructure e){
+                System.out.println("Incorrect file structure!");
+                loaded = null;
+            }
+            catch (IllegalTileSymbol a){
+                System.out.println("Illegal symbols detected");
+                loaded = null;
+            }
+        }
+
+        instance1 = new GameHandler(streamlined,width,height, saveGame, loaded, playerName);
         while(true){
             System.out.println(instance1);
             try {

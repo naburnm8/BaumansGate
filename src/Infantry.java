@@ -6,6 +6,7 @@ public class Infantry extends Unit{
         name = "Infantry type ";
         if(type == 1){
             stats = new int[]{50, 100, 100, 8, 10, 10};
+            stats_noCHNG = new int[]{50, 100, 100, 8, 10, 10};
             name = name + "Swordman";
             symbol = 'ĩ';
             alt_symbol = 'Ĩ';
@@ -13,6 +14,7 @@ public class Infantry extends Unit{
         }
         else if (type == 2) {
             stats = new int[]{35,100,100,4,6,15};
+            stats_noCHNG = new int[]{35,100,100,4,6,15};
             name = name + "Spearman";
             symbol = 'ī';
             alt_symbol = 'Ī';
@@ -20,6 +22,7 @@ public class Infantry extends Unit{
         }
         else if (type == 3) {
             stats = new int[]{45,9,1,3,4,20};
+            stats_noCHNG = new int[]{45,9,1,3,4,20};
             name = name + "Hatchetman";
             symbol = 'ĭ';
             alt_symbol = 'Ĭ';
@@ -27,6 +30,7 @@ public class Infantry extends Unit{
         }
         else {
             stats = new int[]{50, 5, 1, 8, 3, 10};
+            stats_noCHNG = new int[]{50, 5, 1, 8, 3, 10};
             name = name + "Swordman";
             symbol = 'ĩ';
             alt_symbol = 'Ĩ';

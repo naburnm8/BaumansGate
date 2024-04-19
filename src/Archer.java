@@ -6,6 +6,7 @@ public class Archer extends Unit{
         name = "Archer type ";
         if(type == 1){
             stats = new int[]{30, 6, 5, 8, 2, 15};
+            stats_noCHNG = new int[]{30, 6, 5, 8, 2, 15};
             name = name + "Longbow";
             symbol = 'ā';
             alt_symbol = 'Ā';
@@ -13,6 +14,7 @@ public class Archer extends Unit{
         }
         else if (type == 2) {
             stats = new int[]{25,3,3,4,4,19};
+            stats_noCHNG = new int[]{25,3,3,4,4,19};
             name = name + "Shortbow";
             symbol = 'ă';
             alt_symbol = 'Ă';
@@ -20,6 +22,7 @@ public class Archer extends Unit{
         }
         else if (type == 3) {
             stats = new int[]{40,7,6,3,2,23};
+            stats_noCHNG = new int[]{40,7,6,3,2,23};
             name = name + "Crossbow";
             symbol = 'ą';
             alt_symbol = 'Ą';
@@ -27,6 +30,7 @@ public class Archer extends Unit{
         }
         else{
             stats = new int[]{30, 6, 5, 8, 2, 15};
+            stats_noCHNG = new int[]{30, 6, 5, 8, 2, 15};
             name = name + "Longbow";
             symbol = 'ā';
             alt_symbol = 'Ā';
