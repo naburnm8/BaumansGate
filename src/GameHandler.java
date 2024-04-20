@@ -78,14 +78,12 @@ public class GameHandler{
         }
         putCharacters();
         city = new City(20,20);
-        if (loaded == null){
-            return;
+        if (loaded != null){
+            city = new City(loaded.resources()[0], loaded.resources()[1], loaded.buildings(), loaded.researchedUnits());
         }
-        city = new City(loaded.resources()[0], loaded.resources()[1], loaded.buildings(), loaded.researchedUnits());
-        if (map == null){
-            return;
+        if (map != null){
+            playfield = new Field(map);
         }
-        playfield = new Field(map);
     }
     @Override
     public String toString() {
