@@ -9,9 +9,10 @@ public class City {
     private ArrayList<Unit> researchedUnits;
     private ArrayList<Unit> addableResearchedUnits;
     private boolean didResearch;
-    public final String[] names = {"Hospital", "Tavern", "Blacksmith", "Armoury", "Academy", "Market", "Workshop"};
+    private boolean ongoingCelebration;
+    public final String[] names = {"Hospital", "Tavern", "Blacksmith", "Armoury", "Academy", "Market", "Workshop", "MarketShop"};
     public final String[] modStats = {"Health", "Movement", "Attack", "Defence"};
-    private final int[][] prices = {{10,10}, {5,15},{20, 0}, {9,9}, {14,14}, {5,5}, {10,5}};
+    private final int[][] prices = {{10,10}, {5,15},{20, 0}, {9,9}, {14,14}, {5,5}, {10,5}, {10,5}};
     private int BuildingNameToIndex(String building){
         for (int i = 0; i < names.length; i++){
             if (building.equals(names[i])){
@@ -20,8 +21,17 @@ public class City {
         }
         return -1;
     }
+
+    public void setOngoingCelebration(boolean ongoingCelebration) {
+        this.ongoingCelebration = ongoingCelebration;
+    }
+
+    public boolean isOngoingCelebration() {
+        return ongoingCelebration;
+    }
+
     public SaveGame export(){
-        return new SaveGame(buildings,resources,researchedUnits);
+        return new SaveGame(buildings,resources,researchedUnits, ongoingCelebration);
     }
     public int getBuildingByName(String building){
         /*int index = BuildingNameToIndex(building);
@@ -33,16 +43,17 @@ public class City {
         }
         return buildings.get(building);
     }
-    City(int wood, int stone, HashMap<String, Integer> buildings, ArrayList<Unit> researchedUnits){
+    City(int wood, int stone, HashMap<String, Integer> buildings, ArrayList<Unit> researchedUnits, boolean ongoingCelebration){
         didResearch = false;
         resources = new int[]{wood, stone};
         this.buildings = buildings;
         this.researchedUnits = researchedUnits;
         addableResearchedUnits = new ArrayList<>();
         addableResearchedUnits.addAll(researchedUnits);
+        this.ongoingCelebration = ongoingCelebration;
     }
     City (int wood, int stone){
-        this(wood, stone, new HashMap<>(), new ArrayList<Unit>());
+        this(wood, stone, new HashMap<>(), new ArrayList<Unit>(), false);
     }
     public boolean BuildBuilding(String building){
         int index = BuildingNameToIndex(building);

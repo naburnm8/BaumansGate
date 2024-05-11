@@ -14,6 +14,7 @@ public class GameHandler{
     private Field playfield;
     private char[] gnd_symbols;
     private City city;
+    private MarketShop marketShop;
 
     private int gndSymbolToIndex(char symbol){
         for (int i = 0; i < gnd_symbols.length; i++){
@@ -66,6 +67,7 @@ public class GameHandler{
         Player_Deck = shop.commenceShopping(streamlined);
         account = shop.getAccount();
         Invader_Deck = shop.invaderShopping(streamlined);
+        marketShop = new MarketShop(0, false);
         if (streamlined){
             playfield = new Field(10,10);
         }
@@ -82,7 +84,7 @@ public class GameHandler{
         putCharacters();
         city = new City(20,20);
         if (loaded != null){
-            city = new City(loaded.resources()[0], loaded.resources()[1], loaded.buildings(), loaded.researchedUnits());
+            city = new City(loaded.resources()[0], loaded.resources()[1], loaded.buildings(), loaded.researchedUnits(), loaded.ongoingCelebration());
         }
 
     }
@@ -91,6 +93,7 @@ public class GameHandler{
         String output = playfield.toString();
         for (Unit u: Player_Deck){
             output = output + "\n" + u.shortToString() + ", standing on: " + playfield.at(u.getX(),u.getY(),false);
+            output = output + ", " + u.getStatByName("Defence") + ", " + u.getStatByName("Movement") + ", " + u.getStatByName("Attack");
         }
         return output;
     }
@@ -246,10 +249,30 @@ public class GameHandler{
             }
         }
     }
+    private void assignWorkshopEffects(){
+        if (city.getBuildingByName("Workshop") == 0){
+            System.out.println("Current gold balance: " + account);
+            return;
+        }
+        System.out.println("You've gained " + (city.getBuildingByName("Workshop")) + " gold from workshops!");
+        account = account + city.getBuildingByName("Workshop");
+        System.out.println("Current gold balance: " + account);
+    }
+    private void handleMarketShop(){
+        if (city.getBuildingByName("MarketShop") == 0){
+            return;
+        }
+        marketShop.setLevel(city.getBuildingByName("MarketShop"));
+        marketShop.setOngoingCelebration(city.isOngoingCelebration());
+        marketShop.production();
+    }
+
     public void playerTurn() throws IOException {
         bleedOut();
         Scanner stream = new Scanner(System.in);
-        System.out.println("Your turn!\nSyntax: -attack x y; -move x y; -skip; -retreat; -help; -build; -addResearched; -getResources");
+        assignWorkshopEffects();
+        handleMarketShop();
+        System.out.println("Your turn!\nSyntax: -attack x y; -move x y; -skip; -retreat; -help; -build; -addResearched; -getResources; -marketShop");
         String input = "";
         ArrayList<Unit> revived = new ArrayList<>();
         ArrayList<Unit> toBeAdded = new ArrayList<>();
@@ -279,6 +302,31 @@ public class GameHandler{
                 opDamage = u.getEffect("OpportunityDamage");
                 threat = u.getEffect("Threatened");
                 input = stream.nextLine();
+                if(input.equals("-marketShop")){
+                    if (city.getBuildingByName("MarketShop")==0){
+                        System.out.println("You have no marketShops built!");
+                        continue;
+                    }
+                    System.out.println(marketShop);
+                    Scanner sc4 = new Scanner(System.in);
+                    System.out.println("Syntax: -sell [name] -quit");
+                    String scan = sc4.nextLine();
+                    if(scan.equals("quit")){
+                        continue;
+                    }
+                    if(scan.equals("-debug")){
+                        marketShop.productionDEB(true);
+                        System.out.println("see ya in the next turn!");
+                        continue;
+                    }
+                    String[] split = scan.split(" ");
+                    if (split[0].equals("-sell")){
+                        int income = marketShop.sell(split[1]);
+                        account = account + income;
+                        System.out.println("Current gold balance: " + account);
+                        continue;
+                    }
+                }
                 if(input.equals("-getResources")){
                     if(city.getBuildingByName("Market") == 0){
                         System.out.println("No market built!");
@@ -569,12 +617,14 @@ public class GameHandler{
     public boolean endCondition() throws IOException {
         if (Player_Deck.isEmpty()){
             System.out.println("Invader wins!");
+            city.setOngoingCelebration(false);
             save();
             return true;
         }
         if (Invader_Deck.isEmpty()){
             System.out.println("Player wins!");
             city.addResources(20,20);
+            city.setOngoingCelebration(true);
             save();
             return true;
         }

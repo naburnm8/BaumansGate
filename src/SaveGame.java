@@ -9,10 +9,12 @@ public class SaveGame implements Serializable {
     private ArrayList<Unit> researchedUnits;
     private HashMap<String,Integer> buildings;
     private int[] resources;
-    SaveGame(HashMap<String,Integer> buildings, int[] resources, ArrayList<Unit> researchedUnits){
+    private boolean celebration;
+    SaveGame(HashMap<String,Integer> buildings, int[] resources, ArrayList<Unit> researchedUnits, boolean celebration){
         this.buildings = buildings;
         this.researchedUnits = researchedUnits;
         this.resources = resources;
+        this.celebration = celebration;
     }
     public HashMap<String, Integer> buildings(){
         return buildings;
@@ -22,5 +24,8 @@ public class SaveGame implements Serializable {
     }
     public int[] resources(){
         return resources;
+    }
+    public boolean ongoingCelebration(){
+        return celebration;
     }
 }
