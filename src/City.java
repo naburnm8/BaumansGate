@@ -1,9 +1,11 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 
 public class City {
     private int[] resources;
-    private int[] buildings;
+    //private int[] buildings;
+    private HashMap<String, Integer> buildings;
     private ArrayList<Unit> researchedUnits;
     private ArrayList<Unit> addableResearchedUnits;
     private boolean didResearch;
@@ -22,13 +24,16 @@ public class City {
         return new SaveGame(buildings,resources,researchedUnits);
     }
     public int getBuildingByName(String building){
-        int index = BuildingNameToIndex(building);
+        /*int index = BuildingNameToIndex(building);
         if (index == -1){
             return -1;
+        }*/
+        if (buildings.get(building) == null){
+            return 0;
         }
-        return buildings[index];
+        return buildings.get(building);
     }
-    City(int wood, int stone, int[] buildings, ArrayList<Unit> researchedUnits){
+    City(int wood, int stone, HashMap<String, Integer> buildings, ArrayList<Unit> researchedUnits){
         didResearch = false;
         resources = new int[]{wood, stone};
         this.buildings = buildings;
@@ -37,7 +42,7 @@ public class City {
         addableResearchedUnits.addAll(researchedUnits);
     }
     City (int wood, int stone){
-        this(wood, stone, new int[]{0,0,0,0,0,0,0}, new ArrayList<Unit>());
+        this(wood, stone, new HashMap<>(), new ArrayList<Unit>());
     }
     public boolean BuildBuilding(String building){
         int index = BuildingNameToIndex(building);
@@ -45,17 +50,17 @@ public class City {
             System.out.println("Not enough resources!");
             return false;
         }
-        if (buildings[index] >= 4){
+        if (getBuildingByName(building) >= 4){
             System.out.println("Maximum lvl/quantity reached!");
             return false;
         }
-        if(building.equals("Academy") && buildings[index] >= 1){
+        if(building.equals("Academy") && getBuildingByName(building) >= 1){
             System.out.println("Academy max lvl reached!");
             return false;
         }
         resources[0] = resources[0] - prices[index][0];
         resources[1] = resources[1] - prices[index][1];
-        buildings[index] = buildings[index] + 1;
+        buildings.put(building, getBuildingByName(building) + 1);
         return true;
     }
     @Override
@@ -63,10 +68,9 @@ public class City {
         String output = "";
         output = output + "Remaining resources: Wood - " + resources[0] + "; Stone - " + resources[1] + "\n";
         for (String building: names){
-            int index = BuildingNameToIndex(building);
-            output = output + "Building: " + building + ", " + buildings[index] + "\n";
+            output = output + "Building: " + building + ", " + getBuildingByName(building) + "\n";
         }
-        if (buildings[BuildingNameToIndex("Academy")] == 1 && !didResearch){
+        if (getBuildingByName("Academy") == 1 && !didResearch){
             output = output + "Research available" + "\n";
         }
         return output;
@@ -80,7 +84,7 @@ public class City {
         return output;
     }
     public boolean researchUnit(){
-        if (didResearch || buildings[BuildingNameToIndex("Academy")] < 1){
+        if (didResearch || getBuildingByName("Academy") < 1){
             return false;
         }
         System.out.println("Enter unit type: [Infantry - 1; Archer - 2; Mounted - 3]");
