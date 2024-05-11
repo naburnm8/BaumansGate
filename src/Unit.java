@@ -102,13 +102,13 @@ public abstract class Unit implements Serializable{
     public int getIdentifier(){
         return identifier;
     }
-    public int getCurr_health(){
-        return curr_health;
-    }
     public String getName(){
         return name;
     }
     public int getClass_identifier(){
         return class_identifier;
+    }
+    public Point getCoordinates(){
+        return new Point(coordinates[0], coordinates[1]);
     }
 }

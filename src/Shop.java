@@ -29,6 +29,24 @@ public class Shop{
             System.out.println(Catalogue.get(i));
         }
     }
+    public ArrayList<Unit> shopByIndex(int[] positions){
+        ArrayList<Unit> bought = new ArrayList<>();
+        for(int i: positions){
+            if (account <= 10){
+                break;
+            }
+            Unit chosen = Catalogue.get(i);
+            Unit addable = switch (chosen.getIdentifier()) {
+                case (1) -> new Infantry(chosen.getClass_identifier(), 0, 0);
+                case (2) -> new Archer(chosen.getClass_identifier(), 0, 0);
+                case (3) -> new Mounted(chosen.getClass_identifier(), 0, 0);
+                default -> null;
+            };
+            bought.add(addable);
+            account = account - addable.getStatByName("Cost");
+        }
+        return bought;
+    }
     public ArrayList<Unit> commenceShopping(boolean streamlined){
         ArrayList<Unit> Deck = new ArrayList<>();
         if (streamlined){

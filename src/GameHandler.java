@@ -15,7 +15,17 @@ public class GameHandler{
     private char[] gnd_symbols;
     private City city;
     private MarketShop marketShop;
-
+    public void putPlayfield(Point a, char symb){
+        playfield.put(a, symb);
+    }
+    public ArrayList<Unit> getUnits(boolean bot){
+        if (bot){
+            return Invader_Deck;
+        }
+        else{
+            return Player_Deck;
+        }
+    }
     private int gndSymbolToIndex(char symbol){
         for (int i = 0; i < gnd_symbols.length; i++){
             if(gnd_symbols[i] == symbol){
@@ -97,11 +107,14 @@ public class GameHandler{
         }
         return output;
     }
-    private int evaluateDistanceEUC(Point a, Point b){
+    public int evaluateDistanceEUC(Point a, Point b){
         Point difference = new Point(Math.abs(a.x - b.x), Math.abs(a.y - b.y));
         return (int)Math.sqrt(Math.pow(difference.x,2) + Math.pow(difference.y,2));
     }
-    private int evaluateMovement(Unit u, Point a, Point b){
+    public boolean canAttack(Unit u, int distance){
+        return u.getStatByName("Range") >= distance;
+    }
+    public int evaluateMovement(Unit u, Point a, Point b){
         ArrayList<Character> passedTiles = new ArrayList<>();
         int differenceX = b.x - a.x;
         if (differenceX > 0){
@@ -134,7 +147,18 @@ public class GameHandler{
         System.out.println(totalMovementCost);
         return totalMovementCost;
     }
-    private boolean attack (Unit attacker, Unit defender){
+    public boolean canMove(Unit u, Point a, Point b){
+        int cost = evaluateMovement(u, a, b);
+        boolean isOccupied = playfield.isOccupied(b);
+        return u.getStatByName("Movement") >= cost && !isOccupied;
+    }
+    public boolean isOccupied(Point a){
+        return playfield.isOccupied(a);
+    }
+    public char fieldAt(Point a, boolean printable){
+        return playfield.atPoint(a, printable);
+    }
+    public boolean attack (Unit attacker, Unit defender){
         int damage = attacker.getStatByName("Attack");
         double reduction_coef = (double)defender.getStatByName("Defence") / 8;
         damage = (int) ((double)damage - (double)damage*0.33*reduction_coef);
@@ -142,6 +166,13 @@ public class GameHandler{
             return true;
         }
         return false;
+    }
+    public void attackAndKill(Unit attacker, Unit defender){
+        boolean killed = attack(attacker, defender);
+        if (killed){
+            Player_Deck.remove(defender);
+            Invader_Deck.remove(defender);
+        }
     }
     private int findUnitByCoordinates(ArrayList<Unit> units, Point a){
         for(int i = 0; i < units.size(); i++){
@@ -574,6 +605,12 @@ public class GameHandler{
         String log = "";
         for(Unit u: Invader_Deck){
             assignThreatenedStatus();
+            if (u.getCurrentHealth() <= (int)(u.getStatByName("Health")*0.3)){
+                u.addEffect("Retreats", 1);
+            }
+            else{
+                u.addEffect("Retreats", 0);
+            }
             Point playerUnitLocation = scanForPlayer(u);
             if (playerUnitLocation.x != -1){
                 int indexOfDefender = findUnitByCoordinates(Player_Deck, playerUnitLocation);
