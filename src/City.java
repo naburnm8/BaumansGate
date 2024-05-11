@@ -6,11 +6,10 @@ public class City {
     private int[] buildings;
     private ArrayList<Unit> researchedUnits;
     private ArrayList<Unit> addableResearchedUnits;
-    private ArrayList<String> enhancedStats;
     private boolean didResearch;
     public final String[] names = {"Hospital", "Tavern", "Blacksmith", "Armoury", "Academy", "Market", "Workshop"};
     public final String[] modStats = {"Health", "Movement", "Attack", "Defence"};
-    private final int[][] prices = {{10,10}, {5,15},{20, 0}, {9,9}, {14,88}, {5,5}, {10,5}};
+    private final int[][] prices = {{10,10}, {5,15},{20, 0}, {9,9}, {14,14}, {5,5}, {10,5}};
     private int BuildingNameToIndex(String building){
         for (int i = 0; i < names.length; i++){
             if (building.equals(names[i])){
@@ -34,7 +33,8 @@ public class City {
         resources = new int[]{wood, stone};
         this.buildings = buildings;
         this.researchedUnits = researchedUnits;
-        addableResearchedUnits = researchedUnits;
+        addableResearchedUnits = new ArrayList<>();
+        addableResearchedUnits.addAll(researchedUnits);
     }
     City (int wood, int stone){
         this(wood, stone, new int[]{0,0,0,0,0,0,0}, new ArrayList<Unit>());
@@ -91,6 +91,7 @@ public class City {
         String scanned1 = stream.next();
         String[] split = scanned1.split(",");
         Researched.replaceStats(new int[]{Integer.parseInt(split[0]), Integer.parseInt(split[1]), Integer.parseInt(split[2]), Integer.parseInt(split[3]), Integer.parseInt(split[4]), 0});
+        System.out.println("help");
         researchedUnits.add(Researched);
         addableResearchedUnits.add(Researched);
         didResearch = true;
@@ -100,12 +101,15 @@ public class City {
         resources[0] = resources[0] + wood;
         resources[1] = resources[1] + stone;
     }
-    public ArrayList<Unit> getResearchedUnits(){
-        ArrayList<Unit> out = new ArrayList<>(addableResearchedUnits);
+    public void getResearchedUnits(){
         addableResearchedUnits = new ArrayList<>();
-        return out;
+        return;
     }
     public ArrayList<Unit> getResearchedUnitsSafe(){
+        for(Unit u: addableResearchedUnits){
+            System.out.println("addable");
+            System.out.println(u);
+        }
         return addableResearchedUnits;
     }
     public void getResources(int gold){

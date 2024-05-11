@@ -15,6 +15,7 @@ public abstract class Unit implements Serializable{
     protected char alt_symbol;
     protected int identifier;
     protected int class_identifier;
+    public boolean healed = false;
     protected HashMap<String, Integer> effects;
     protected int StatNameToIndex(String stat){
         for(int i = 0; i < stat_names.length; i++){
