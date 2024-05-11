@@ -237,6 +237,12 @@ public class GameHandler{
         for(Unit u: Player_Deck){
             for(int i = 0; i < city.modStats.length; i++){
                 u.modifyStatByName(city.modStats[i], u.getBaseStatByName(city.modStats[i]) + city.getBuildingByName(city.names[i]));
+                if (city.modStats[i].equals("Health") && !u.healed){
+                    u.setHealth(u.getCurrentHealth() + city.getBuildingByName(city.names[i]));
+                    if (city.getBuildingByName(city.names[i]) != 0){
+                        u.healed = true;
+                    }
+                }
             }
         }
     }
@@ -246,6 +252,7 @@ public class GameHandler{
         System.out.println("Your turn!\nSyntax: -attack x y; -move x y; -skip; -retreat; -help; -build; -addResearched; -getResources");
         String input = "";
         ArrayList<Unit> revived = new ArrayList<>();
+        ArrayList<Unit> toBeAdded = new ArrayList<>();
         for (Unit u: Player_Deck){
             System.out.println("Now in control of: " + u.getName());
             int actions = 2;
@@ -305,11 +312,15 @@ public class GameHandler{
                             break;
                         }
                         unit.modifyCoordinates(x,y);
+                        playfield.put(new Point(unit.getX(), unit.getY()), unit.getSymbol());
+                        toBeAdded.add(unit);
                     }
                     if (skipped){
                         continue;
                     }
-                    revived.addAll(city.getResearchedUnits());
+                    for(Unit unit1: toBeAdded){
+                        System.out.println(unit1);
+                    }
                     continue;
                 }
                 if(input.equals("-build")){
@@ -502,6 +513,12 @@ public class GameHandler{
             }
         }
         Player_Deck.addAll(revived);
+        for (Unit u: toBeAdded){
+            System.out.println(u);
+            System.out.println("a");
+        }
+        Player_Deck.addAll(toBeAdded);
+        toBeAdded = new ArrayList<>();
     }
 
     public void invaderTurn(){
