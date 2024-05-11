@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -6,6 +7,7 @@ public class Field{
     private int height;
     private char[][] field;
     private char[][] field_printable;
+    private ArrayList<Obstacle> obstacles;
     static public char[] gnd_symbols = {'▒','░','▓','◆'};
     final private double TREES_P = 0.05;
     final private double HILL_P = 0.1;
@@ -84,6 +86,7 @@ public class Field{
         this.height = loadedMap.height;
         field = new char[height][width];
         field_printable = new char[height][width];
+        obstacles = loadedMap.obstacles;
         fillFieldLoaded(loadedMap);
         copyField();
 
@@ -93,6 +96,7 @@ public class Field{
         this.height = height;
         field = new char[height][width];
         field_printable = new char[height][width];
+        obstacles = Obstacle.generateDefaultObstacles();
         fillField();
         copyField();
     }
@@ -106,6 +110,14 @@ public class Field{
             output = output + "\n";
         }
         return output;
+    }
+    public Obstacle getObstacleBySymbol(char symbol){
+        for (Obstacle obs: obstacles){
+            if(obs.getSymbol() == symbol){
+                return obs;
+            }
+        }
+        return null;
     }
     public String toStringField(){
         String output = new String();

@@ -1,9 +1,14 @@
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.ArrayList;
 
-class IllegalTileSymbol extends Exception{}
-public class MapData {
+public class MapData implements Serializable{
+    @Serial
+    private static final long serialVersionUID = 1491;
     public int width;
     public int height;
     public char[][] mapLayout;
+    public ArrayList<Obstacle> obstacles;
     private void fillBlanks(){
         for(int i = 0; i < height; i++){
             for(int j = 0; j < width; j++){
@@ -11,43 +16,24 @@ public class MapData {
             }
         }
     }
-    private boolean isLegalCharacter(char query){
-        for(int i = 0; i < Field.gnd_symbols.length; i++){
-            if (query == Field.gnd_symbols[i]){
-                return true;
-            }
-        }
-        return false;
-    }
-    private boolean checkLegitimacy(){
-        for (char[] arr: mapLayout){
-            for(char symb: arr){
-                if(!isLegalCharacter(symb)){
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-    MapData(int width, int height, char[][] mapLayout) throws IllegalTileSymbol {
+    MapData(int width, int height, char[][] mapLayout, ArrayList<Obstacle> obstacles){
         this.width = width;
         this.height = height;
         this.mapLayout = mapLayout;
-        if(!checkLegitimacy()){
-            throw new IllegalTileSymbol();
-        }
+        this.obstacles = obstacles;
 
     }
     MapData(int width, int height){
         this.width = width;
         this.height = height;
         mapLayout = new char[height][width];
+        obstacles = Obstacle.generateDefaultObstacles();
         fillBlanks();
     }
     private String toStringLegalTypes(){
         String out = "";
-        for(int i = 0; i < Field.gnd_symbols.length; i++){
-            out = out + (i+1) + ". " + Field.gnd_symbols[i] + "\n";
+        for(Obstacle obs: obstacles){
+            out = out + obs.toString() + "\n";
         }
         return out;
     }
@@ -60,10 +46,11 @@ public class MapData {
             }
             output = output + "\n";
         }
-        //output = output + toStringLegalTypes();
+        output = output + toStringLegalTypes();
         return output;
     }
     public String toStringMenu() {
         return this + toStringLegalTypes();
     }
+
 }

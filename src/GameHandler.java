@@ -14,7 +14,7 @@ public class GameHandler{
     private Field playfield;
     private char[] gnd_symbols;
     private City city;
-    final private double[][] fines = {{1,1.5,2,1.2},{1,1.8,2.2,1},{1,2.2,1.2,1.5}};
+
     private int gndSymbolToIndex(char symbol){
         for (int i = 0; i < gnd_symbols.length; i++){
             if(gnd_symbols[i] == symbol){
@@ -70,6 +70,9 @@ public class GameHandler{
             playfield = new Field(10,10);
         }
         playfield = new Field(_width,_height);
+        if (map != null){
+            playfield = new Field(map);
+        }
         try {
             assignCoords();
         } catch (NotEnoughFieldSpace e){
@@ -81,9 +84,7 @@ public class GameHandler{
         if (loaded != null){
             city = new City(loaded.resources()[0], loaded.resources()[1], loaded.buildings(), loaded.researchedUnits());
         }
-        if (map != null){
-            playfield = new Field(map);
-        }
+
     }
     @Override
     public String toString() {
@@ -100,7 +101,6 @@ public class GameHandler{
     private int evaluateMovement(Unit u, Point a, Point b){
         ArrayList<Character> passedTiles = new ArrayList<>();
         int differenceX = b.x - a.x;
-        //System.out.println(differenceX);
         if (differenceX > 0){
             for(int i = a.x + 1; i < b.x + 1; i++){
                 passedTiles.add(playfield.at(i,a.y,false));
@@ -124,7 +124,9 @@ public class GameHandler{
         int totalMovementCost = 0;
         for (char tile: passedTiles){
             System.out.print(tile);
-            totalMovementCost = totalMovementCost + (int)fines[identifier-1][gndSymbolToIndex(tile)];
+            //totalMovementCost = totalMovementCost + (int)fines[identifier-1][gndSymbolToIndex(tile)];
+            Obstacle tileObs = playfield.getObstacleBySymbol(tile);
+            totalMovementCost = totalMovementCost + (int)tileObs.fine(identifier-1);
         }
         System.out.println(totalMovementCost);
         return totalMovementCost;
@@ -235,12 +237,6 @@ public class GameHandler{
         for(Unit u: Player_Deck){
             for(int i = 0; i < city.modStats.length; i++){
                 u.modifyStatByName(city.modStats[i], u.getBaseStatByName(city.modStats[i]) + city.getBuildingByName(city.names[i]));
-                if (city.modStats[i].equals("Health") && !u.healed){
-                    u.setHealth(u.getCurrentHealth() + city.getBuildingByName(city.names[i]));
-                    if (city.getBuildingByName(city.names[i]) != 0){
-                        u.healed = true;
-                    }
-                }
             }
         }
     }
@@ -250,7 +246,6 @@ public class GameHandler{
         System.out.println("Your turn!\nSyntax: -attack x y; -move x y; -skip; -retreat; -help; -build; -addResearched; -getResources");
         String input = "";
         ArrayList<Unit> revived = new ArrayList<>();
-        ArrayList<Unit> toBeAdded = new ArrayList<>();
         for (Unit u: Player_Deck){
             System.out.println("Now in control of: " + u.getName());
             int actions = 2;
@@ -310,16 +305,11 @@ public class GameHandler{
                             break;
                         }
                         unit.modifyCoordinates(x,y);
-                        playfield.put(new Point(unit.getX(), unit.getY()), unit.getSymbol());
-                        toBeAdded.add(unit);
                     }
                     if (skipped){
                         continue;
                     }
-                    for(Unit unit1: toBeAdded){
-                        System.out.println(unit1);
-                    }
-                    city.getResearchedUnits();
+                    revived.addAll(city.getResearchedUnits());
                     continue;
                 }
                 if(input.equals("-build")){
@@ -512,12 +502,6 @@ public class GameHandler{
             }
         }
         Player_Deck.addAll(revived);
-        for (Unit u: toBeAdded){
-            System.out.println(u);
-            System.out.println("a");
-        }
-        Player_Deck.addAll(toBeAdded);
-        toBeAdded = new ArrayList<>();
     }
 
     public void invaderTurn(){

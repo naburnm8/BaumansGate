@@ -1,5 +1,6 @@
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 
 public class MapWriter {
     private String path;
@@ -7,10 +8,10 @@ public class MapWriter {
         this.path = path;
     }
     public void write(MapData map) throws IOException {
-        FileWriter fw = new FileWriter(path);
-        fw.write(Integer.toString(map.width)+"\n");
-        fw.write(Integer.toString(map.height)+"\n");
-        fw.write(map.toString());
-        fw.close();
+        FileOutputStream fStream = new FileOutputStream(path);
+        ObjectOutputStream oStream = new ObjectOutputStream(fStream);
+        oStream.writeObject(map);
+        oStream.close();
+        fStream.close();
     }
 }

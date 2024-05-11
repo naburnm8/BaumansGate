@@ -54,16 +54,8 @@ public class BaumansGate {
         String path = stream1.next();
         if (!path.equals("n")){
             MapReader reader = new MapReader(path);
-            try{
-                loaded = reader.read();
-            } catch (IncorrectFileStructure e){
-                System.out.println("Incorrect file structure!");
-                loaded = null;
-            }
-            catch (IllegalTileSymbol a){
-                System.out.println("Illegal symbols detected");
-                loaded = null;
-            }
+            loaded = reader.read();
+            System.out.println(loaded);
         }
 
         instance1 = new GameHandler(streamlined,width,height, saveGame, loaded, playerName);
