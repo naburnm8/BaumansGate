@@ -265,6 +265,7 @@ public class GameHandler{
         marketShop.setLevel(city.getBuildingByName("MarketShop"));
         marketShop.setOngoingCelebration(city.isOngoingCelebration());
         marketShop.production();
+        System.out.println(marketShop.isOngoingCelebration());
     }
 
     public void playerTurn() throws IOException {

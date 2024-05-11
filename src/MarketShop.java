@@ -98,5 +98,8 @@ public class MarketShop {
     public void setOngoingCelebration(boolean ongoingCelebration){
         this.ongoingCelebration = ongoingCelebration;
     }
+    public boolean isOngoingCelebration(){
+        return ongoingCelebration;
+    }
 
 }
