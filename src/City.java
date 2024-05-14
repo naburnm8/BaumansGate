@@ -21,6 +21,9 @@ public class City {
         }
         return -1;
     }
+    public int[] getResources(){
+        return resources;
+    }
     public HashMap<String, Integer> getBuildings(){
         return buildings;
     }
@@ -116,7 +119,7 @@ public class City {
         String scanned1 = stream.next();
         String[] split = scanned1.split(",");
         Researched.replaceStats(new int[]{Integer.parseInt(split[0]), Integer.parseInt(split[1]), Integer.parseInt(split[2]), Integer.parseInt(split[3]), Integer.parseInt(split[4]), 0});
-        System.out.println("help");
+        //System.out.println("help");
         researchedUnits.add(Researched);
         addableResearchedUnits.add(Researched);
         didResearch = true;
@@ -131,10 +134,10 @@ public class City {
         return;
     }
     public ArrayList<Unit> getResearchedUnitsSafe(){
-        for(Unit u: addableResearchedUnits){
+       /* for(Unit u: addableResearchedUnits){
             System.out.println("addable");
             System.out.println(u);
-        }
+        }*/
         return addableResearchedUnits;
     }
     public void getResources(int gold){

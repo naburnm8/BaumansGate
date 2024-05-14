@@ -1,6 +1,7 @@
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Objects;
 
 public abstract class Unit implements Serializable{
     @Serial
@@ -88,7 +89,19 @@ public abstract class Unit implements Serializable{
             output = output + "\n" + stat_names[i] + ": " + stats[i];
         }
         output = output + "\n" + "Current health: " + curr_health;
+        output = output + "\n" + "Symbol: " + symbol;
         return output;
+    }
+    @Override
+    public boolean equals(Object obj){
+        if(obj == null){
+            return false;
+        }
+        if(obj.getClass() != this.getClass()){
+            return false;
+        }
+        Unit Uobj = (Unit)obj;
+        return Uobj.toString().equals(this.toString());
     }
     public String shortToString(){
         return "Unit: " + name + ", current health: " + curr_health + ", available movement: " + getStatByName("Movement") + ", symbol: " + symbol;
@@ -110,5 +123,8 @@ public abstract class Unit implements Serializable{
     }
     public Point getCoordinates(){
         return new Point(coordinates[0], coordinates[1]);
+    }
+    public int[] getStats(){
+        return stats_noCHNG;
     }
 }

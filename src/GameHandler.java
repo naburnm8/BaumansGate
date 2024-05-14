@@ -378,7 +378,7 @@ public class GameHandler{
                     }
                     System.out.println("Account: " + account + "\n" + "How much gold would you like to spend? ");
                     Scanner stream2 = new Scanner(System.in);
-                    int spent = stream2.nextInt();
+                    int spent = stream.nextInt();
                     if(account - spent < 0){
                         System.out.println("Not enough gold!");
                         continue;

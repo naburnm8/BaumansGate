@@ -16,6 +16,21 @@ public class SaveGame implements Serializable {
         this.resources = resources;
         this.celebration = celebration;
     }
+    @Override
+    public String toString(){
+        return "Buildings: " + buildings + "\n" + "Researched units: " + researchedUnits + "\n" + "Resources: " + resources[0] + " " + resources[1] + "\n" + "Is celebrating: " + celebration;
+    }
+    @Override
+    public boolean equals(Object obj){
+        if(obj == null){
+            return false;
+        }
+        if(obj.getClass() != this.getClass()){
+            return false;
+        }
+        SaveGame saveObj = (SaveGame) obj;
+        return this.toString().equals(saveObj.toString());
+    }
     public HashMap<String, Integer> buildings(){
         return buildings;
     }

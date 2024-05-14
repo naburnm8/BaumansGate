@@ -1,6 +1,7 @@
 import org.junit.Test;
 
 import java.io.*;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -166,14 +167,23 @@ public class Testing {
         int actual = actual_map.get("Market");
         assertEquals(1, actual);
     }
-    private boolean marketTest(GameHandler instance) throws IOException {
-        String input = "-getResources\n10\n";
+    private boolean marketTest(GameHandler instance) throws IOException, NoSuchFieldException, IllegalAccessException {
+        String input = "-getResources\n10\n-move 8 8";
         InputStream old_stream = System.in;
         InputStream stream = new ByteArrayInputStream(input.getBytes());
         System.setIn(stream);
+        try{
         instance.playerTurn();
-
-        return true;
+        }catch(ArrayIndexOutOfBoundsException e){
+            System.out.println("Exception catched!");
+        }
+        Field field = GameHandler.class.getDeclaredField("city");
+        field.setAccessible(true);
+        City instance_city = (City) field.get(instance);
+        int[] resources = instance_city.getResources();
+        System.setIn(old_stream);
+        field.setAccessible(false);
+        return resources[0] == 30 && resources[1] == 30 && instance.getAccount() == 62;
     }
     private boolean workshopTest(GameHandler instance) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         Method method = GameHandler.class.getDeclaredMethod("assignWorkshopEffects");
@@ -183,22 +193,54 @@ public class Testing {
         method.setAccessible(false);
         return account == 71;
     }
-    private boolean academyTest(GameHandler instance){
-
-
-        return true;
+    private boolean academyTest(GameHandler instance) throws NoSuchFieldException, IllegalAccessException {
+        Field field = GameHandler.class.getDeclaredField("city");
+        field.setAccessible(true);
+        City instance_city = (City) field.get(instance);
+        String searchIn = instance_city.toString();
+        boolean researchAvailable = searchIn.contains("Research available");
+        String input = "1\n1,1,1,1,1\n";
+        InputStream old_stream = System.in;
+        InputStream stream = new ByteArrayInputStream(input.getBytes());
+        System.setIn(stream);
+        instance_city.researchUnit();
+        System.setIn(old_stream);
+        CustomUnit expected = new CustomUnit(1, 0, 0, (char)(97 + 1));
+        expected.replaceStats(new int[]{1, 1, 1, 1, 1, 0});
+        boolean correctlyAdded = expected.equals(instance_city.getResearchedUnitsSafe().get(0));
+        return researchAvailable && correctlyAdded;
     }
     @Test
-    public void buildingsHandlingTest() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, IOException {
+    public void buildingsHandlingTest() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, IOException, NoSuchFieldException {
         GameHandler testing = new GameHandler(true, 7, 7, "TESTER");
         testing.setBuildingLevel("Academy", 1);
         testing.setBuildingLevel("Market", 1);
         testing.setBuildingLevel("Workshop", 1);
-        assertTrue(marketTest(testing));
         assertTrue(workshopTest(testing));
+        assertTrue(marketTest(testing));
         assertTrue(academyTest(testing));
-
-
+    }
+    private static SaveGame getSaveGame() {
+        HashMap<String, Integer> expected_map = new HashMap<>();
+        expected_map.put("Tavern", 1);
+        expected_map.put("Blacksmith", 1);
+        expected_map.put("Academy", 1);
+        expected_map.put("MarketShop", 1);
+        int[] expected_resources = {31,46};
+        boolean expected_celebration = true;
+        ArrayList<Unit> researchedUnitsExpected = new ArrayList<>();
+        SaveGame expected = new SaveGame(expected_map, expected_resources, researchedUnitsExpected, expected_celebration);
+        return expected;
+    }
+    @Test
+    public void saveTest() throws IOException, ClassNotFoundException {
+        FileInputStream inputStream = new FileInputStream("junitSaveTest" + ".sav");
+        ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
+        SaveGame actual = (SaveGame) objectInputStream.readObject();
+        objectInputStream.close();
+        inputStream.close();
+        SaveGame expected = getSaveGame();
+        assertEquals(expected,actual);
     }
 
 }
