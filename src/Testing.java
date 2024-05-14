@@ -1,9 +1,10 @@
 import org.junit.Test;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
+import java.io.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import static org.junit.Assert.*;
 
@@ -136,7 +137,6 @@ public class Testing {
         GameHandler testing = new GameHandler(true,7,7, null, map, "TESTER");
         ArrayList<Unit> Player_Deck = testing.getUnits(false);
         ArrayList<Unit> Invader_Deck = testing.getUnits(true);
-        ArrayList<Point> occupiedCoords = new ArrayList<>();
         for (Unit u: Player_Deck){
             assertTrue(testing.isOccupied(u.getCoordinates()));
         }
@@ -157,6 +157,48 @@ public class Testing {
         Invader_Deck.get(1).setHealth(5); // has 35 initial health
         testing.invaderTurn();
         assertEquals(1, Invader_Deck.get(1).getEffect("Retreats"));
+    }
+    @Test
+    public void buildingsLevelingTest(){
+        GameHandler testing = new GameHandler(true, 7, 7, "TESTER");
+        testing.buildBuilding("Market");
+        HashMap<String, Integer> actual_map = testing.getBuildings();
+        int actual = actual_map.get("Market");
+        assertEquals(1, actual);
+    }
+    private boolean marketTest(GameHandler instance) throws IOException {
+        String input = "-getResources\n10\n";
+        InputStream old_stream = System.in;
+        InputStream stream = new ByteArrayInputStream(input.getBytes());
+        System.setIn(stream);
+        instance.playerTurn();
+
+        return true;
+    }
+    private boolean workshopTest(GameHandler instance) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Method method = GameHandler.class.getDeclaredMethod("assignWorkshopEffects");
+        method.setAccessible(true);
+        method.invoke(instance);
+        int account = instance.getAccount();
+        method.setAccessible(false);
+        return account == 71;
+    }
+    private boolean academyTest(GameHandler instance){
+
+
+        return true;
+    }
+    @Test
+    public void buildingsHandlingTest() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, IOException {
+        GameHandler testing = new GameHandler(true, 7, 7, "TESTER");
+        testing.setBuildingLevel("Academy", 1);
+        testing.setBuildingLevel("Market", 1);
+        testing.setBuildingLevel("Workshop", 1);
+        assertTrue(marketTest(testing));
+        assertTrue(workshopTest(testing));
+        assertTrue(academyTest(testing));
+
+
     }
 
 }

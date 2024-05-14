@@ -11,13 +11,13 @@ public class Obstacle implements Serializable{
         this.fines = fines;
         this.symbol = symbol;
     }
-    char getSymbol(){
+    public char getSymbol(){
         return symbol;
     }
-    double fine(int pos){
+    public double fine(int pos){
         return fines[pos];
     }
-    static ArrayList<Obstacle> generateDefaultObstacles(){
+    public static ArrayList<Obstacle> generateDefaultObstacles(){
         char[] gnd_symbols = Field.gnd_symbols;
         double[][] fines = {{1,1.5,2,1.2},{1,1.8,2.2,1},{1,2.2,1.2,1.5}};
         ArrayList<Obstacle> out = new ArrayList<>();

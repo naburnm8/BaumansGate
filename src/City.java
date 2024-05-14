@@ -21,7 +21,9 @@ public class City {
         }
         return -1;
     }
-
+    public HashMap<String, Integer> getBuildings(){
+        return buildings;
+    }
     public void setOngoingCelebration(boolean ongoingCelebration) {
         this.ongoingCelebration = ongoingCelebration;
     }
@@ -29,7 +31,15 @@ public class City {
     public boolean isOngoingCelebration() {
         return ongoingCelebration;
     }
-
+    public void setBuildingLevel(String building, int level){
+        if(level > 4){
+            return;
+        }
+        if(building.equals("Academy") && level > 1){
+            return;
+        }
+        buildings.put(building,level);
+    }
     public SaveGame export(){
         return new SaveGame(buildings,resources,researchedUnits, ongoingCelebration);
     }

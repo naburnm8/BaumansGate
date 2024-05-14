@@ -298,6 +298,18 @@ public class GameHandler{
         marketShop.production();
         System.out.println(marketShop.isOngoingCelebration());
     }
+    public int getAccount(){
+        return account;
+    }
+    public void buildBuilding(String building){
+        city.BuildBuilding(building);
+    }
+    public void setBuildingLevel(String building, int level){
+        city.setBuildingLevel(building, level);
+    }
+    public HashMap<String,Integer> getBuildings(){
+        return city.getBuildings();
+    }
 
     public void playerTurn() throws IOException {
         bleedOut();
