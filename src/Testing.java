@@ -1,3 +1,5 @@
+import org.apache.log4j.*;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.*;
@@ -6,18 +8,38 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Properties;
 
 import static org.junit.Assert.*;
 
 public class Testing {
+    static Logger logger = Logger.getLogger(Testing.class.getName());
+    @BeforeClass
+    public static void setUpLogger(){
+        FileAppender fileAppender = new FileAppender();
+        fileAppender.setFile("resources/logging/log.txt");
+        fileAppender.setLayout(new PatternLayout("%d [%t] %-5p %c - %m%n"));
+        fileAppender.setAppend(false);
+        fileAppender.activateOptions();
+        /*
+        ConsoleAppender consoleAppender = new ConsoleAppender();
+        consoleAppender.setLayout(new PatternLayout("%d [%t] %-5p %c - %m%n"));
+        consoleAppender.activateOptions();
+         */
+        logger.addAppender(fileAppender);
+        //logger.addAppender(consoleAppender);
+        logger.setLevel(Level.toLevel(getLoggingLevel()));
+    }
     @Test
     public void testPlayerWin() throws IOException {
+
         GameHandler testing = new GameHandler(true, 7,7,"TESTER");
         ArrayList<Unit> Player_Deck = testing.getUnits(false);
         ArrayList<Unit> Invader_Deck = testing.getUnits(true);
         testing.attackAndKill(Player_Deck.get(0), Invader_Deck.get(0));
         testing.attackAndKill(Player_Deck.get(1), Invader_Deck.get(0));
         assertEquals(0, Invader_Deck.size());
+        logger.info("Player win test passed");
     }
     @Test
     public void testBotWin() throws IOException {
@@ -28,6 +50,7 @@ public class Testing {
         testing.attackAndKill(Invader_Deck.get(1), Player_Deck.get(0));
         testing.attackAndKill(Invader_Deck.get(1), Player_Deck.get(0));
         assertEquals(0, Player_Deck.size());
+        logger.info("Bot win test passed");
     }
     @Test
     public void finesTest() throws IOException {
@@ -37,6 +60,7 @@ public class Testing {
         int costExpected = (int)(1.5 + 2.0 + 1.2);
         int costActual = testing.evaluateMovement(testing.getUnits(false).get(0), new Point(0,0), new Point(0,3));
         assertEquals(costExpected, costActual);
+        logger.info("Fines test passed");
     }
     @Test
     public void attackRangeTest(){
@@ -49,6 +73,7 @@ public class Testing {
         System.out.println(expected);
         int actual = testing.evaluateDistanceEUC(a,b);
         assertEquals(expected,actual);
+        logger.info("Attack range test passed");
     }
     @Test
     public void attackTest(){
@@ -62,6 +87,7 @@ public class Testing {
         int range = (int)Math.sqrt(Math.pow(x_dif,2) + Math.pow(y_dif,2)); // range = 4, pdeck[3] = 5, pdeck[2] = 3:
         assertTrue(testing.canAttack(Player_Deck.get(3), range));
         assertFalse(testing.canAttack(Player_Deck.get(2), range));
+        logger.info("Attack test passed");
     }
     @Test
     public void movementTest() throws IOException {
@@ -74,6 +100,7 @@ public class Testing {
         assertTrue(testing.canMove(Player_Deck.get(2), new Point(0,0), new Point(0,3))); // pdeck[2] movement = 6, 0 3 has no other units
         testing.putPlayfield(new Point(0,3), 'W');
         assertFalse(testing.canMove(Player_Deck.get(2), new Point(0,0), new Point(0,3))); // pdeck[2] movement = 6, 0 3 has a unit
+        logger.info("Movement test passed");
     }
     @Test
     public void deathTest(){
@@ -84,6 +111,7 @@ public class Testing {
         boolean result2 = testing.attack(Player_Deck.get(2), Invader_Deck.get(1)); // plr attack 5, invdr hp > 5
         assertTrue(result1);
         assertFalse(result2);
+        logger.info("Death test passed");
     }
     @Test
     public void defenceTest(){
@@ -100,6 +128,7 @@ public class Testing {
         testing.attack(attacker,defender);
         int actual = defender.getCurrentHealth();
         assertEquals(expected, actual);
+        logger.info("Defence test passed");
     }
     @Test
     public void shopTest(){
@@ -112,6 +141,7 @@ public class Testing {
         String expectedSTR = expected.toString();
         String actualSTR = actual.toString();
         assertEquals(expectedSTR, actualSTR);
+        logger.info("Shop test passed");
     }
     @Test
     public void botTest(){
@@ -130,6 +160,7 @@ public class Testing {
         actual = actual.replaceAll("\r", "");
         expected = expected.replaceAll("\n", "");
         assertEquals(expected,actual);
+        logger.info("Bot test passed");
     }
     @Test
     public void fieldPrintTest() throws IOException {
@@ -149,6 +180,7 @@ public class Testing {
                 assertEquals(map.mapLayout[i][j], testing.fieldAt(new Point(j,i), false));
             }
         }
+        logger.info("Field print test passed");
     }
     @Test
     public void retreatBotTest(){
@@ -158,6 +190,7 @@ public class Testing {
         Invader_Deck.get(1).setHealth(5); // has 35 initial health
         testing.invaderTurn();
         assertEquals(1, Invader_Deck.get(1).getEffect("Retreats"));
+        logger.info("Bot retreat test passed");
     }
     @Test
     public void buildingsLevelingTest(){
@@ -166,16 +199,18 @@ public class Testing {
         HashMap<String, Integer> actual_map = testing.getBuildings();
         int actual = actual_map.get("Market");
         assertEquals(1, actual);
+        logger.info("Buildings leveling test passed");
     }
     private boolean marketTest(GameHandler instance) throws IOException, NoSuchFieldException, IllegalAccessException {
         String input = "-getResources\n10\n-move 8 8";
         InputStream old_stream = System.in;
         InputStream stream = new ByteArrayInputStream(input.getBytes());
         System.setIn(stream);
+        logger.warn("Turn skip inbound");
         try{
             instance.playerTurn();
         }   catch(ArrayIndexOutOfBoundsException e){
-            System.out.println("Exception catched!");
+            logger.error("Turn skipped by " + e);
             }
         Field field = GameHandler.class.getDeclaredField("city");
         field.setAccessible(true);
@@ -219,6 +254,7 @@ public class Testing {
         assertTrue(workshopTest(testing));
         assertTrue(marketTest(testing));
         assertTrue(academyTest(testing));
+        logger.info("Buildings handling test passed");
     }
     private static SaveGame getSaveGame() {
         HashMap<String, Integer> expected_map = new HashMap<>();
@@ -241,6 +277,18 @@ public class Testing {
         inputStream.close();
         SaveGame expected = getSaveGame();
         assertEquals(expected,actual);
+        logger.info("Save test passed");
+    }
+    private static String getLoggingLevel() {
+        String pathToProperties = "resources/logging/logging.properties";
+        Properties properties = new Properties();
+        try (FileInputStream fstream = new FileInputStream(pathToProperties)){
+            properties.load(fstream);
+        } catch (IOException e) {
+            System.err.println("Exception loading properties file");
+            return "DEBUG";
+        }
+        return properties.getProperty("logging_level");
     }
 
 }
