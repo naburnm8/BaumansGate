@@ -173,10 +173,10 @@ public class Testing {
         InputStream stream = new ByteArrayInputStream(input.getBytes());
         System.setIn(stream);
         try{
-        instance.playerTurn();
-        }catch(ArrayIndexOutOfBoundsException e){
+            instance.playerTurn();
+        }   catch(ArrayIndexOutOfBoundsException e){
             System.out.println("Exception catched!");
-        }
+            }
         Field field = GameHandler.class.getDeclaredField("city");
         field.setAccessible(true);
         City instance_city = (City) field.get(instance);

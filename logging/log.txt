@@ -1,0 +1,1 @@
+[ INFO ] - Tester:6 - logger is here!
