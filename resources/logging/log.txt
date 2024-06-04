@@ -1,2 +1,4 @@
-2024-05-19 01:23:16,083 [main] WARN  Testing - Turn skip inbound
-2024-05-19 01:23:16,094 [main] ERROR Testing - Turn skipped by java.lang.ArrayIndexOutOfBoundsException: Index 7 out of bounds for length 7
+2024-05-19 01:43:58,783 [main] WARN  Testing - Turn skip inbound
+2024-05-19 01:43:58,794 [main] ERROR Testing - Turn skipped by java.lang.ArrayIndexOutOfBoundsException: Index 7 out of bounds for length 7
+2024-05-27 18:56:15,682 [main] INFO  Tester - logger is here!
+2024-05-27 18:56:38,156 [main] INFO  Tester - logger is here!

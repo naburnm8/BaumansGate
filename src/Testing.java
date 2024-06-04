@@ -12,7 +12,7 @@ import java.util.Properties;
 
 import static org.junit.Assert.*;
 
-public class Testing {
+public class Testing{
     static Logger logger = Logger.getLogger(Testing.class.getName());
     @BeforeClass
     public static void setUpLogger(){
@@ -94,7 +94,6 @@ public class Testing {
         MapReader read = new MapReader("junitTestMap.map");
         MapData map = read.read();
         GameHandler testing = new GameHandler(true,7,7, null, map, "TESTER");
-        int cost = (int)(1.5 + 2.0 + 1.2); // = 4
         ArrayList<Unit> Player_Deck = testing.getUnits(false);
         assertFalse(testing.canMove(Player_Deck.get(0), new Point(0,0), new Point(0,3))); // pdeck[0] movement = 3, 0 3 has no other units
         assertTrue(testing.canMove(Player_Deck.get(2), new Point(0,0), new Point(0,3))); // pdeck[2] movement = 6, 0 3 has no other units
@@ -265,8 +264,7 @@ public class Testing {
         int[] expected_resources = {31,46};
         boolean expected_celebration = true;
         ArrayList<Unit> researchedUnitsExpected = new ArrayList<>();
-        SaveGame expected = new SaveGame(expected_map, expected_resources, researchedUnitsExpected, expected_celebration);
-        return expected;
+        return new SaveGame(expected_map, expected_resources, researchedUnitsExpected, expected_celebration);
     }
     @Test
     public void saveTest() throws IOException, ClassNotFoundException {
@@ -286,7 +284,7 @@ public class Testing {
             properties.load(fstream);
         } catch (IOException e) {
             System.err.println("Exception loading properties file");
-            return "DEBUG";
+            return "ALL";
         }
         return properties.getProperty("logging_level");
     }
